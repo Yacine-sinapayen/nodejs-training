@@ -7,8 +7,9 @@ const http = require('http');
 // Cette méthode prend comme argu la fonction qui sera appeler
 // à chaque requête reçu par le serveur.
 const server = http.createServer((req, res) => {
-    res.end('voila la réponse du serveur');
+    res.end('voila la réponse test');
 });
 
-// Maintenant le serveur doit écouter 
-// et attendre les requête envoyées
+/* Notre serveur va être écouter sur une variable d'environnement 
+ou sur le port 3000 s'il est dispo*/
+server.listen(process.env.PORT || 3000);

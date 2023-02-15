@@ -1,29 +1,56 @@
 // on import express
-const express = require('express');
+const express = require("express");
 
 // const app qui sera notre application
 const app = express();
 
+// Ce middleware ne prend pas d'adresse en premier paramètre, afin de s'appliquer à toutes les routes.
 app.use((req, res, next) => {
-    console.log('Requête reçue')
-    // renvoi vers le prochain middleware
-    next();
-})
+  // Ce header permet d'accéder à notre API depuis n'importe quelle origine ( '*' ) ;
+  res.setHeader("Access-Control-Allow-Origin", "*");
 
-// modification du code de la res http pour test
-app.use((req, res, next) => {
-    res.status(201);
-    next();
-})
+  // On donne l'autorisation d'utiliser certains headers
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
+  );
 
-app.use((req, res, next) => {
-    res.json({ message : 'votre requête a bien été reçue !'})
-    next();
-})
+  // On l'autorisation d'utiliser ceratines méthodes
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, DELETE, PATH, OPTIONS"
+  );
+  next();
+});
 
-app.use((req, res) => {
-    console.log('Réponse envoyée avec succès !');
-})
+/* Je vais créer un nouveau middleware "GET".
+Je passe à ma méthode "use" un nouvelle argu qui est un string correspondant à la route pour laquelle nous souhaitons enregistrer cet élément de middleware */
+app.use("/api/stuff", (req, res, next) => {
+  const stuff = [
+    {
+      _id: "oeihfzeoi",
+      title: "Mon premier objet",
+      description: "Les infos de mon premier objet",
+      imageUrl:
+        "https://cdn.pixabay.com/photo/2019/06/11/18/56/camera-4267692_1280.jpg",
+      price: 4900,
+      userId: "qsomihvqios",
+    },
+    {
+      _id: "oeihfzeomoihi",
+      title: "Mon deuxième objet",
+      description: "Les infos de mon deuxième objet",
+      imageUrl:
+        "https://cdn.pixabay.com/photo/2019/06/11/18/56/camera-4267692_1280.jpg",
+      price: 2900,
+      userId: "qsomihvqios",
+    },
+  ];
+  /*Ce middleware attribut un code 200 à la res donc une resp réussi.
+    Et il renvoi en resp json le tableau stuff avec nos objet à 
+    l'intérieur*/
+  res.status(200).json(stuff);
+});
 
 // On va exporter notre const app pour y avoir accès depuis les autres projets
 module.exports = app;

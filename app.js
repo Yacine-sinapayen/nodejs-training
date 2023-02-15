@@ -4,6 +4,9 @@ const express = require("express");
 // const app qui sera notre application
 const app = express();
 
+// Ce middleware intercepte toutes les requetes ayant un "content-type json". Il nous donne accès à 'req.body'. À l'ancienne cela se faisait via le package 'body-parser'
+app.use(express.json());
+
 // Ce middleware ne prend pas d'adresse en premier paramètre, afin de s'appliquer à toutes les routes.
 app.use((req, res, next) => {
   // Ce header permet d'accéder à notre API depuis n'importe quelle origine ( '*' ) ;
@@ -23,9 +26,16 @@ app.use((req, res, next) => {
   next();
 });
 
+app.post('/api/stuff', (req, res, next) => {
+    console.log(req.body);
+    res.status(201).json({
+        message: 'objet créé !'
+    });
+});
+
 /* Je vais créer un nouveau middleware "GET".
 Je passe à ma méthode "use" un nouvelle argu qui est un string correspondant à la route pour laquelle nous souhaitons enregistrer cet élément de middleware */
-app.use("/api/stuff", (req, res, next) => {
+app.get("/api/stuff", (req, res, next) => {
   const stuff = [
     {
       _id: "oeihfzeoi",

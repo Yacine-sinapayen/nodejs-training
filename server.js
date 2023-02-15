@@ -44,7 +44,7 @@ const errorHandler = error => {
     }
 };
 
-/* Depuis mon package http, j'initialiese un serveur avec la méthode  "createServer".
+/* Depuis mon package http, j'initialise un serveur avec la méthode  "createServer".
 Cette méthode prend comme argu la fonction app qui sera appeler
 à chaque requête reçu par le serveur. */
 const server = http.createServer(app);

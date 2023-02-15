@@ -4,6 +4,15 @@ const express = require("express");
 // const app qui sera notre application
 const app = express();
 
+// j'importe mongoose
+const mongoose = require('mongoose');
+
+mongoose.connect('mongodb+srv://sapienyaya:TYHv9rPmkITiDUU6974@cluster0.7lcq5st.mongodb.net/?retryWrites=true&w=majority', 
+{ useNewUrlParser: true,
+    useUnifiedTopology: true })
+  .then(() => console.log('Connexion à MongoDB réussie !'))
+  .catch(() => console.log('Connexion à MongoDB échouée !'));
+
 // Ce middleware intercepte toutes les requetes ayant un "content-type json". Il nous donne accès à 'req.body'. À l'ancienne cela se faisait via le package 'body-parser'
 app.use(express.json());
 
@@ -28,6 +37,7 @@ app.use((req, res, next) => {
 
 app.post('/api/stuff', (req, res, next) => {
     console.log(req.body);
+    //Un code HTTP de 201 représente généralement une création de données réussie
     res.status(201).json({
         message: 'objet créé !'
     });

@@ -36,7 +36,7 @@ app.use((req, res, next) => {
   // On l'autorisation d'utiliser ceratines méthodes
   res.setHeader(
     "Access-Control-Allow-Methods",
-    "GET, POST, DELETE, PATH, OPTIONS"
+    "GET, POST, PUT, DELETE, PATH, OPTIONS"
   );
   next();
 });
@@ -83,6 +83,21 @@ app.get("/api/stuff", (req, res, next) => {
   .then(things => res.status(200).json(things))
   .catch(error => res.status(400).json({ error }));
 });
+
+// Modification
+app.put('/api/stuff/:id', (req, res, next) => {
+    /* le première argu de la méthode updateOne est l'objet de comparaison qui permet de récupérer l'id qui est égale à l'id envoyé dans les parmas de la req. Le 2nd argu est la nouvelle version de l'objet que je récupère via le spread operator pour récupérer les infos du corp de la requête. Nous devons quznd même aussi dire que  "l'id correspond à celui des params" */
+    Thing.updateOne({ _id: req.params.id }, {...req.body, _id: req.params.id})
+    .then(() => res.status(200).json({ message: 'Objet modifié'}))
+    .catch(error => res.status(400).json({ error }));
+});
+
+// Supression
+app.delete('/api/stuff/:id', (req, res, next) => {
+    Thing.deleteOne({ _id: req.params.id})
+    .then(() => res.status(200).json({ message : 'Objet supprimé'}))
+    .catch(error => res.status(400).json({ error }));
+})
 
 // On va exporter notre const app pour y avoir accès depuis les autres projets
 module.exports = app;

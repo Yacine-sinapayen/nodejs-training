@@ -5,13 +5,19 @@ const express = require("express");
 const app = express();
 
 // j'importe mongoose
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-mongoose.connect('mongodb+srv://sapienyaya:TYHv9rPmkITiDUU6974@cluster0.7lcq5st.mongodb.net/?retryWrites=true&w=majority', 
-{ useNewUrlParser: true,
-    useUnifiedTopology: true })
-  .then(() => console.log('Connexion à MongoDB réussie !'))
-  .catch(() => console.log('Connexion à MongoDB échouée !'));
+// j'importe mon modèle
+const Thing = require("./models/Thing");
+
+// connexion à ma bdd
+mongoose
+  .connect(
+    "mongodb+srv://sapienyaya:TYHv9rPmkITiDUU6974@cluster0.7lcq5st.mongodb.net/?retryWrites=true&w=majority",
+    { useNewUrlParser: true, useUnifiedTopology: true }
+  )
+  .then(() => console.log("Connexion à MongoDB réussie !"))
+  .catch(() => console.log("Connexion à MongoDB échouée !"));
 
 // Ce middleware intercepte toutes les requetes ayant un "content-type json". Il nous donne accès à 'req.body'. À l'ancienne cela se faisait via le package 'body-parser'
 app.use(express.json());
@@ -35,41 +41,47 @@ app.use((req, res, next) => {
   next();
 });
 
-app.post('/api/stuff', (req, res, next) => {
+app.post("/api/stuff", (req, res, next) => {
+  /* Code test pour voir si l'api focntionnée au départ
     console.log(req.body);
-    //Un code HTTP de 201 représente généralement une création de données réussie
+    "Un code HTTP de 201 représente généralement une création de données réussie."
     res.status(201).json({
-        message: 'objet créé !'
-    });
+         message: 'objet créé !'
+    }); */
+
+  /* La version actuel du front renvoi un id lors de la création d'un 'thing' <=> produit, or mongodb génère un id automatiquement donc nous allons le suprimer du corp de la requête que nous renvoi le front.*/
+  delete req.body._id;
+
+  /* Création d'une nouvelle instance de Thing */
+  const thing = new Thing({
+    /* spread opérator pour récupérer le corp de la requête */
+    ...req.body,
+  });
+
+  /* J'enregistre l'objet dans la bdd et retourne un promise. Dans le then même si la requête se passe bien il faut renvoyer quelque chose sinon la requête expire 
+R : La méthode save() renvoie une Promise. */
+  thing.save()
+    .then(() => res.status(201).json({ message: "Objet enregsitré !" }))
+    .catch((error) => res.status(400).json({ error }));
 });
 
-/* Je vais créer un nouveau middleware "GET".
-Je passe à ma méthode "use" un nouvelle argu qui est un string correspondant à la route pour laquelle nous souhaitons enregistrer cet élément de middleware */
+/* Nous utilisons la méthode get() pour répondre uniquement aux demandes GET à cet endpoint ;
+- Nous utilisons deux-points : en face du segment dynamique de la route pour la rendre accessible en tant que paramètre ;
+- Nous utilisons ensuite la méthode findOne() dans notre modèle Thing pour trouver le Thing unique ayant le même _id que le paramètre de la requête ;
+- Ce Thing est ensuite retourné dans une Promise et envoyé au front-end ;
+- Si aucun Thing n'est trouvé ou si une erreur se produit, nous envoyons une erreur 404 au front-end, avec l'erreur générée. */
+app.get('/api/stuff/:id', (req, res, next) => {
+    Thing.findOne({ _id: req.params.id})
+    .then(thing => res.status(200).json(thing))
+    .catch(error => res.status(404).json({ error }));
+})
+
+/* Je passe à ma méthode "use" un nouvelle argu qui est un string correspondant à la route pour laquelle nous souhaitons enregistrer cet élément de middleware */
 app.get("/api/stuff", (req, res, next) => {
-  const stuff = [
-    {
-      _id: "oeihfzeoi",
-      title: "Mon premier objet",
-      description: "Les infos de mon premier objet",
-      imageUrl:
-        "https://cdn.pixabay.com/photo/2019/06/11/18/56/camera-4267692_1280.jpg",
-      price: 4900,
-      userId: "qsomihvqios",
-    },
-    {
-      _id: "oeihfzeomoihi",
-      title: "Mon deuxième objet",
-      description: "Les infos de mon deuxième objet",
-      imageUrl:
-        "https://cdn.pixabay.com/photo/2019/06/11/18/56/camera-4267692_1280.jpg",
-      price: 2900,
-      userId: "qsomihvqios",
-    },
-  ];
-  /*Ce middleware attribut un code 200 à la res donc une resp réussi.
-    Et il renvoi en resp json le tableau stuff avec nos objet à 
-    l'intérieur*/
-  res.status(200).json(stuff);
+  /* nous utilisons la méthode find() dans notre modèle Mongoose afin de renvoyer un tableau contenant tous les Things dans notre base de données. */
+  Thing.find()
+  .then(things => res.status(200).json(things))
+  .catch(error => res.status(400).json({ error }));
 });
 
 // On va exporter notre const app pour y avoir accès depuis les autres projets

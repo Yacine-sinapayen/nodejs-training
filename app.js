@@ -6,8 +6,10 @@ const app = express();
 // j'importe mongoose
 const mongoose = require("mongoose");
 
-// J'importe mon router
+// J'importe mon router global
 const stuffRoutes = require('./routes/stuff.js');
+// J'importe mon router pour les utilisateurs
+const userRoutes = require('./routes/user');
 
 /* ---------- Connexion à ma bdd ----------*/ 
 mongoose
@@ -43,8 +45,9 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.json());
 
-/* ---------- LOGIQUE ROUTER ----------*/
+/* ---------- INITIALISATION DES ROUTES ----------*/
 app.use('/api/stuff', stuffRoutes);
+app.use('/app/auth', userRoutes);
 
 // On va exporter notre const app pour y avoir accès depuis les autres projets
 module.exports = app;

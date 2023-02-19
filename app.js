@@ -47,7 +47,7 @@ app.use(bodyParser.json());
 
 /* ---------- INITIALISATION DES ROUTES ----------*/
 app.use('/api/stuff', stuffRoutes);
-app.use('/app/auth', userRoutes);
+app.use('/api/auth', userRoutes);
 
 // On va exporter notre const app pour y avoir accès depuis les autres projets
 module.exports = app;

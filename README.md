@@ -20,3 +20,7 @@ une modification d'un fichier et va redémarrer le serveur automatiquement.
 
 # Package de cryptage bcrypt
 "npm install --save bcrypt"
+
+# Package jsonwebtoken
+Ce package va nous permettre de creer des token et de les vérifier.
+"npm install --save jsonwebtoken"

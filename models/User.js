@@ -1,3 +1,6 @@
+
+// Création du modèle de BDD pour notre utilisateur
+
 const mongoose = require('mongoose');
 
 /* uniqueValidator va être un plugin que l'on va appliquer 
